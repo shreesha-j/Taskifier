@@ -1,20 +1,35 @@
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+// Load environment variables
+const dotenv = require('dotenv');
+dotenv.config();
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const cors = require('cors');
 
-var app = express();
+// Import routes
+const indexRouter = require('./src/v1/routes');
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+// Initialize Express app
+const app = express();
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+// Enable CORS for cross-origin requests
+app.use(cors());
+
+// Set up view engine configuration
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+
+// Use middleware for logging, parsing, and serving static files
+app.use(logger('dev')); // Logs requests to the console
+app.use(express.json()); // Parses incoming JSON requests
+app.use(express.urlencoded({ extended: false })); // Parses URL-encoded data
+app.use(cookieParser()); // Parses cookies from HTTP requests
+app.use(express.static(path.join(__dirname, 'public'))); // Serves static files
+
+// Define API routes
+app.use('/api/v1', indexRouter);
 
 module.exports = app;
