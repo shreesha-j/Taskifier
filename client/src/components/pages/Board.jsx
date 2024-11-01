@@ -8,6 +8,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import boardApi from '../../api/boardApi';
 import { setBoards } from '../../redux/features/boardSlice';
 import { setFavouriteList } from '../../redux/features/favouriteSlice';
+import Trello from '../../common/Trello';
 
 let timer;
 const timeout = 500;
@@ -29,6 +30,7 @@ const Board = () => {
 
   const boards = useSelector((state) => state.board.value);
   const favouriteList = useSelector((state) => state.favourites.value);
+
 
   useEffect(() => {
     /**
@@ -205,6 +207,10 @@ const Board = () => {
               '& .MuiOutlinedInput-root': { fontSize: '0.8rem' },
             }}
           />
+        </Box>
+        <Box>
+          {/* Trello board */}
+          <Trello data={sections} boardId={boardId} />
         </Box>
       </Box>
     </>

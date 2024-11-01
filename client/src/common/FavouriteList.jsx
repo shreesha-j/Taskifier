@@ -1,14 +1,10 @@
-/*************  ✨ Codeium Command 🌟  *************/
 /**
- * FavouriteList component to display and manage favourite boards.
-import { Box, ListItem, ListItemButton, Typography } from '@mui/material'
-import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useParams, Link } from 'react-router-dom'
-import boardApi from '../api/boardApi'
-import { setFavouriteList } from '../redux/features/favouriteSlice'
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
-
+ * FavouriteList component to display and manage the favourite boards.
+ * Allows reordering of the boards by dragging and dropping.
+ * Provides functionality to update the favourite boards in the store and on the server.
+ *
+ * @returns {JSX.Element} The FavouriteList component.
+ */
 const FavouriteList = () => {
   const dispatch = useDispatch()
   const list = useSelector((state) => state.favourites.value)
@@ -16,6 +12,9 @@ const FavouriteList = () => {
   const { boardId } = useParams()
 
   useEffect(() => {
+    /**
+     * Fetches the favourite boards and updates the state.
+     */
     const getBoards = async () => {
       try {
         const res = await boardApi.getFavourites()
@@ -28,14 +27,33 @@ const FavouriteList = () => {
   }, [])
 
   useEffect(() => {
+    /**
+     * Updates the active index based on the current board ID.
+     */
     const index = list.findIndex(e => e.id === boardId)
     setActiveIndex(index)
   }, [list, boardId])
 
-  const onDragEnd =  () => {
+  const onDragEnd = async ({ source, destination }) => {
+    /**
+     * Updates the favourite boards in the store and on the server.
+     */
+    const newList = [...list]
+    const [removed] = newList.splice(source.index, 1)
+    newList.splice(destination.index, 0, removed)
+
+    const activeItem = newList.findIndex(e => e.id === boardId)
+    setActiveIndex(activeItem)
+
+    dispatch(setFavouriteList(newList))
+
+    try {
+      await boardApi.updateFavouritePosition({ boards: newList })
+    } catch (err) {
+      alert(err)
+    }
   }
 
-  
   return (
     <>
       <ListItem>
@@ -92,5 +110,3 @@ const FavouriteList = () => {
 }
 
 export default FavouriteList
-
-/******  8b4db922-3874-4662-8f8d-b73a546eb395  *******/
