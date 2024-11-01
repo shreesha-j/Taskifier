@@ -3,10 +3,11 @@ import { Box, Drawer, IconButton, List, ListItem, ListItemButton, Typography } f
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined'
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import assets from '../../assets/index'
+import Assets from '../assets/index'
 import { useEffect, useState } from 'react'
-import boardApi from '../../api/boardApi'
-import { setBoards } from '../../redux/features/boardSlice'
+import boardApi from '../api/boardApi'
+import { setBoards } from '../redux/features/boardSlice'
+import  FavouriteList  from './FavouriteList'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 
 
@@ -90,7 +91,7 @@ const Sidebar = () => {
         sx={{
           width: sidebarWidth,
           height: '100vh',
-          backgroundColor: assets.colors.secondary
+          backgroundColor: Assets.colors.secondary
         }}
       >
         <ListItem>
@@ -109,7 +110,7 @@ const Sidebar = () => {
           </Box>
         </ListItem>
         <Box sx={{ paddingTop: '10px' }} />
-        {/* favorate list */}
+        <FavouriteList />
         <Box sx={{ paddingTop: '10px' }} />
         <ListItem>
           <Box sx={{

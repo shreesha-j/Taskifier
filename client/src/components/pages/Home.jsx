@@ -1,9 +1,9 @@
 import { Box } from "@mui/material"
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useDispatch } from "react-redux"
-import { setBoards } from "../redux/features/boardSlice"
+import { setBoards } from "../../redux/features/boardSlice"
 import { useNavigate } from "react-router-dom"
-import boardApi from "../api/boardApi"
+import boardApi from "../../api/boardApi"
 import { useState } from "react"
 /**
  * Home component prompting the user to create their first board.

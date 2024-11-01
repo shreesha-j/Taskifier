@@ -5,9 +5,9 @@ import { Box, IconButton, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import boardApi from '../api/boardApi';
-import { setBoards } from '../redux/features/boardSlice';
-import { setFavouriteList } from '../redux/features/favouriteSlice';
+import boardApi from '../../api/boardApi';
+import { setBoards } from '../../redux/features/boardSlice';
+import { setFavouriteList } from '../../redux/features/favouriteSlice';
 
 let timer;
 const timeout = 500;
@@ -118,7 +118,47 @@ const Board = () => {
     }, timeout);
   };
 
+  /**
+   * Toggles the favourite status of the board.
+   */
+  const addFavourite = async () => {
+    try {
+      const board = await boardApi.update(boardId, { favourite: !isFavourite });
+      let newFavouriteList = [...favouriteList];
+      if (isFavourite) {
+        newFavouriteList = newFavouriteList.filter((e) => e.id !== boardId);
+      } else {
+        newFavouriteList.unshift(board);
+      }
+      dispatch(setFavouriteList(newFavouriteList));
+      setIsFavourite(!isFavourite);
+    } catch (err) {
+      alert(err);
+    }
+  };
 
+  /**
+   * Deletes the board and navigates to the next available board or the board list.
+   */
+  const deleteBoard = async () => {
+    try {
+      await boardApi.delete(boardId);
+      if (isFavourite) {
+        const newFavouriteList = favouriteList.filter((e) => e.id !== boardId);
+        dispatch(setFavouriteList(newFavouriteList));
+      }
+
+      const newList = boards.filter((e) => e.id !== boardId);
+      if (newList.length === 0) {
+        navigate('/boards');
+      } else {
+        navigate(`/boards/${newList[0].id}`);
+      }
+      dispatch(setBoards(newList));
+    } catch (err) {
+      alert(err);
+    }
+  };
 
   return (
     <>
