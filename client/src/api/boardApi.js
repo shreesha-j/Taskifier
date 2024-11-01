@@ -29,6 +29,13 @@ const boardApi = {
    * @returns {Promise} The server response.
    */
   getOne: (id) => axiosClient.get(`boards/${id}`),
+
+  /**
+   * Deletes a specific board by its ID.
+   * @param {string} id - The ID of the board to delete.
+   * @returns {Promise} The server response.
+   */
+  delete: (id) => axiosClient.delete(`boards/${id}`),
 };
 
 export default boardApi;
