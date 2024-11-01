@@ -29,7 +29,6 @@ const server = http.createServer(app);
 /**
  * Listen on provided port, on all network interfaces.
  */
-
 mongoose.connect(process.env.MONGODB_URL).then(() => {
   server.listen(port);
   server.on('error', onError);
