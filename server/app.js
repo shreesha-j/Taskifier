@@ -1,13 +1,9 @@
 // Load environment variables
-const dotenv = require('dotenv');
-dotenv.config();
-
-const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const cors = require('cors');
+const cors = require('cors')
 
 // Import routes
 const indexRouter = require('./src/v1/routes');
