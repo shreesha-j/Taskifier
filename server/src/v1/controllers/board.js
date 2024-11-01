@@ -109,3 +109,95 @@ exports.update = async (req, res) => {
     res.status(500).json({ error: 'Failed to update board' });
   }
 };
+
+/**
+ * Retrieves all favourite boards associated with the authenticated user, sorted by favourite position.
+ */
+exports.getFavourites = async (req, res) => {
+  try {
+    const favourites = await Board.find({
+      user: req.user._id,
+      favourite: true
+    }).sort('-favouritePosition')
+    res.status(200).json(favourites)
+  } catch (err) {
+    res.status(500).json(err)
+  }
+}
+
+/**
+ * Updates the favourite positions of multiple boards. The boards should be passed as an object with the key as the position and the value as the board ID.
+ */
+exports.updateFavouritePosition = async (req, res) => {
+  const { boards } = req.body
+  try {
+    for (const key in boards.reverse()) {
+      const board = boards[key]
+      await Board.findByIdAndUpdate(
+        board.id,
+        { $set: { favouritePosition: key } }
+      )
+    }
+    res.status(200).json('updated')
+  } catch (err) {
+    res.status(500).json(err)
+  }
+}
+
+/**
+ * Deletes a board and its associated sections and tasks.
+ * If the board is marked as favourite, updates the favourite positions of remaining boards.
+ * Then, updates the positions of all remaining boards.
+ * 
+ * @param {Object} req - The request object, containing parameters and user information.
+ * @param {Object} res - The response object, used to send back the appropriate HTTP response.
+ */
+exports.delete = async (req, res) => {
+  const { boardId } = req.params;
+  try {
+    // Find and delete tasks within each section of the board
+    const sections = await Section.find({ board: boardId });
+    for (const section of sections) {
+      await Task.deleteMany({ section: section.id });
+    }
+    // Delete all sections of the board
+    await Section.deleteMany({ board: boardId });
+
+    // Check if the board is marked as favourite
+    const currentBoard = await Board.findById(boardId);
+    if (currentBoard.favourite) {
+      // Find and update the favourite positions of remaining favourite boards
+      const favourites = await Board.find({
+        user: currentBoard.user,
+        favourite: true,
+        _id: { $ne: boardId }
+      }).sort('favouritePosition');
+
+      for (const key in favourites) {
+        const element = favourites[key];
+        await Board.findByIdAndUpdate(
+          element.id,
+          { $set: { favouritePosition: key } }
+        );
+      }
+    }
+
+    // Delete the board
+    await Board.deleteOne({ _id: boardId });
+
+    // Update positions of all remaining boards
+    const boards = await Board.find().sort('position');
+    for (const key in boards) {
+      const board = boards[key];
+      await Board.findByIdAndUpdate(
+        board.id,
+        { $set: { position: key } }
+      );
+    }
+
+    res.status(200).json('deleted');
+  } catch (err) {
+    console.error('Error deleting board:', err);
+    res.status(500).json(err);
+  }
+};

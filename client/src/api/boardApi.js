@@ -36,6 +36,26 @@ const boardApi = {
    * @returns {Promise} The server response.
    */
   delete: (id) => axiosClient.delete(`boards/${id}`),
+  /**
+   * Updates a specific board by its ID with the provided parameters.
+   * @param {string} id - The ID of the board to update.
+   * @param {Object} params - The parameters to update the board with.
+   * @returns {Promise} The server response.
+   */
+  update: (id, params) => axiosClient.put(`boards/${id}`, params),
+
+  /**
+   * Retrieves all favourite boards for the authenticated user.
+   * @returns {Promise} The server response.
+   */
+  getFavourites: () => axiosClient.get('boards/favourites'),
+
+  /**
+   * Updates the favourite positions of multiple boards.
+   * @param {Object} params - Parameters containing board IDs and their new favourite positions.
+   * @returns {Promise} The server response.
+   */
+  updateFavouritePosition: (params) => axiosClient.put('boards/favourites', params)
 };
 
 export default boardApi;
